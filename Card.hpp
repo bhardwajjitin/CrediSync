@@ -14,64 +14,25 @@ class Card{
     }
     
     void changepin(int new_pin);
-    void printinfo();
     string getcardno();
-    virtual bool transaction(string type,long long amount);
+    int getpin();
+    virtual bool transaction(string type, long long amount) = 0;  // Pure virtual function
+    void printinfo();
 };
 class DebitCard:public Card{
-    long long user_balance;
+    long long *user_balance;
+    long long *limitleft;
 public:
-    DebitCard(const std::string& cardNum, int pin,string type,long long balance) : Card(cardNum, pin,type), user_balance(balance) {}
+    DebitCard(string& cardNum, int pin,string type,long long *balance,long long *limit) : Card(cardNum, pin,type), user_balance(balance),limitleft(limit) {}
 
-    bool transaction(string type,long long amount) override {
-        if (type == "deposit") {
-            user_balance += amount;
-            cout << "Deposit successful! New balance: " << user_balance << std::endl;
-            return true;
-        } else if (type == "withdraw") {
-            if (user_balance >= amount) {
-                user_balance -= amount;
-                cout << "Withdraw successful! New balance: " << user_balance << std::endl;
-                return true;
-            } else {
-                cout << "Insufficient funds for withdrawal!" << std::endl;
-                return false;
-            }
-        }
-        return false;
-    }
-
+    bool transaction(string type,long long amount) override;
 };
 
 class CreditCard:public Card{
     long long loan;
-    long long limit;
+    long long creditlimit;
 public:
-    CreditCard(const string& cardNum, int pin,string type,long long user_limit) : Card(cardNum, pin,type),limit(user_limit),loan(0){}
+    CreditCard(string& cardNum, int pin,string type,long long user_limit) : Card(cardNum, pin,type),creditlimit(user_limit),loan(0){}
 
-    bool transaction(string type,long long amount) override {
-        if (type == "deposit") {
-            if (loan >= amount) {
-                loan -= amount;
-                cout << "Deposit successful! Remaining loan: " <<loan <<endl;
-            } else {
-                double extra = amount - loan;
-                loan = 0;
-                limit += extra;
-                cout << "Loan repaid! New credit limit: " << limit <<endl;
-            }
-            return true;
-        } else if (type == "withdraw") {
-            if (loan + amount <= limit) {
-                loan += amount;
-                cout << "Withdraw successful! Credit used: " <<limit
-                          << " / " << limit <<endl;
-                return true;
-            } else {
-                cout << "Credit limit exceeded!" <<endl;
-                return false;
-            }
-        }
-        return false;
-    }
+    bool transaction(string type,long long amount) override;
 };

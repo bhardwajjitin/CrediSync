@@ -3,104 +3,197 @@
 using namespace std;
 
 int main() {
-    int stop;
-    Bank& PNB = Bank::getInstance();
-    do {
-        cout << "Press 1 to Create New User" << endl;
-        cout << "Press 2 to Use Already Exist User" << endl;
-        cout << "Press 3 to stop the execution" << endl;
-        cin >> stop;
+    Bank& PNB = Bank::getInstance();  // Singleton Bank instance
+    cout << "==== Welcome to the PNB Bank System ====" << endl;
 
-        if (stop == 1) {
-            string Name, Acc_No;
-            long long balance;
-            cout << "Enter the Name of the User" << endl;
-            cin >> Name;
-            cout << "Enter the Account Number of the User" << endl;
-            cin >> Acc_No;
-            cout << "Enter the Initial Balance of the User" << endl;
-            cin >> balance;
-            PNB.adduser(Name, Acc_No, balance);
-        }
-        else if (stop == 2) {
-            string Acc_No;
-            cout << "Enter the Acc_No to get the User" << endl;
-            cin >>Acc_No;
-            string username = PNB.getUser(Acc_No);
+    while (true) {
+        cout << "\nMain Menu:" << endl;
+        cout << "1. Create New User" << endl;
+        cout << "2. Login to Existing User" << endl;
+        cout << "3. Exit the System" << endl;
+        cout << "Please enter your choice: ";
+        int mainOption;
+        cin >> mainOption;
 
-            if (!username.empty()) {
-                cout << "Hey " << username << endl;
-                
-                int flag = 1;
-                cout << "Press 1 to Create New Card" << endl;
-                cout << "Press 2 to Use Already Exist Card" << endl;
-                cout << "To stop creating the card press 3" << endl;
+        switch (mainOption) {
+            case 1: {
+                // Create a new user
+                string name, accNo;
+                long long balance;
+                int type;
+                cout << "Enter the User's Name: ";
+                cin >> name;
+                cout << "Enter the User's Account Number: ";
+                cin >> accNo;
+                cout << "Enter the Initial Balance: ";
+                cin >> balance;
+                cout<<"Enter the Type of Account \n 1.Savings \n 2.Current"<<endl;
+                cin>>type;
+                if(type==1){
+                    PNB.adduser(name, accNo, balance,"Savings",50000);
+                }
+                else if(type==2){
+                    PNB.adduser(name, accNo, balance,"Current",-1);
+                }
+                else{
+                    cout<<"Please Enter the Valid Choice"<<endl;
+                    continue;
+                }
+                cout<<" Account for " << name << " created successfully!" << endl;
+                break;
+            }
+            case 2: {
+                // User login
+                string accNo;
+                cout << "Enter Account Number to Login: ";
+                cin >> accNo;
+                User* currentUser = PNB.getUser(accNo);
 
-                while (flag != 3) {
-                    cout << "Enter the Card type -> 1.Debit 2.Credit" << endl;
-                    int num;
-                    cin >> num;
+                if (currentUser == nullptr) {
+                    cout << "Invalid Account Number! Try again." << endl;
+                    break;
+                }
 
-                    if (num < 1 || num > 2) {
-                        cout << "Enter the Correct Card type" << endl;
-                        continue;
-                    }
-                    string cardtype = (num == 1) ? "Debit" : "Credit";
-                    string acc_num;
-                    int pin;
-                    cout << "Enter the 5 digits Card Number" << endl;
-                    cin >> acc_num;
-                    cout << "Enter the pin for the Card" << endl;
-                    cin >> pin;
-                    PNB.addCards(acc_num, cardtype, pin, Acc_No);
-                    cout << "Press 1 to Create Another Card" << endl;
-                    cout << "Press 2 to Use Existing Card" << endl;
-                    cin >> flag;
+                bool userLoggedIn = true;
+                cout << "\nWelcome, " << currentUser->getName() << "!" << endl;
+                while (userLoggedIn) {
+                    cout << "1. Create New Card" << endl;
+                    cout << "2. Use Existing Card" << endl;
+                    cout << "3. Balance Enquiry" << endl;
+                    cout << "4. Deposit Money" << endl;
+                    cout << "5. Transfer Funds to Another User" << endl;
+                    cout << "6. Transfer Funds Between Own Accounts" << endl;
+                    cout << "7. Logout" << endl;
+                    cout << "Enter your choice: ";
+                    int userOption;
+                    cin >> userOption;
 
-                    if (flag == 2) {
-                        cout << "Hey " << username << " You have the following Cards which one you want to use" << endl;
-                        PNB.printallCards(Acc_No);
-                        string card_no;
-                        cout << "Enter the Card Number to choose the Card" << endl;
-                        cin >> card_no;
+                    switch (userOption) {
+                        case 1: {
+                            // Create a new card
+                            int cardType;
+                            cout << "Select Card Type: 1. Debit  2. Credit: ";
+                            cin >> cardType;
 
-                        string mycard = PNB.getcard(Acc_No, card_no);
-                        if (!mycard.empty()) {
-                            cout << "What operation do you want to perform?" << endl;
-                            cout << "1. Deposit 2. Withdraw 3. Check Balance" << endl;
-                            int operation;
-                            cin >> operation;
-                            string type="";
-                            switch (operation) {
-                                case 1:
-                                    type="Deposit";
-                                    break;
-                                case 2:
-                                    type="Withdraw";
-                                    break;
-                                case 3:
-                                //    balance check logic here
-                                   break;
-                                default:
-                                    cout << "Invalid operation." << endl;
-                                    break;
+                            if (cardType >= 1 && cardType <= 2) {
+                                string cardNo;
+                                int pin;
+                                cout << "Enter 5-digit Card Number: ";
+                                cin >> cardNo;
+                                cout << "Set a 4-digit PIN for the Card: ";
+                                cin >> pin;
+
+                                string cardTypeStr = (cardType == 1) ? "Debit" : "Credit";
+                                currentUser->addCards(cardNo, cardTypeStr, pin);
+                                cout << cardTypeStr<<" Card created successfully!" << endl;
+                            } else {
+                                cout << "Invalid card type!" << endl;
                             }
-                            if(type!=""){
-                                long long amount;
-                                cout<<"Enter the Transaction Amount"<<endl;
-                                cin>>amount;
-                                PNB.performTransaction(type,Acc_No,card_no,amount);
-                            }
-                        } else {
-                            cout << "The Card Does Not exist for the Particular User" << endl;
+                            break;
                         }
-                    } else if (flag != 1) {
-                        cout << "Oops you have made a wrong choice" << endl;
+                        case 2: {
+                            // Use an existing card
+                            currentUser->printallCards();
+                            string cardNo;
+                            cout << "Enter the Card Number: ";
+                            cin >> cardNo;
+                            Card* selectedCard = currentUser->getcard(cardNo);
+
+                            if (selectedCard != nullptr) {
+                                int cardPin;
+                                cout << "Enter Card PIN for verification: ";
+                                cin >> cardPin;
+
+                                if (selectedCard->getpin() == cardPin) {
+                                    bool cardSessionActive = true;
+                                    while (cardSessionActive) {
+                                        int cardOption;
+                                        cout << "\n1. Deposit\n2. Withdraw\n3. Check Balance\n4. End Session" << endl;
+                                        cout << "Enter your choice: ";
+                                        cin >> cardOption;
+
+                                        string type = "";
+                                        long long amount;
+                                        switch (cardOption) {
+                                            case 1:
+                                                type = "Deposit";
+                                                cout << "Enter amount to deposit: ";
+                                                cin >> amount;
+                                                break;
+                                            case 2:
+                                                type = "Withdraw";
+                                                cout << "Enter amount to withdraw: ";
+                                                cin >> amount;
+                                                break;
+                                            case 3:
+                                                cout << "Your current balance: " << currentUser->getBalance() << endl;
+                                                continue;
+                                            case 4:
+                                                cardSessionActive = false;
+                                                cout << "Ending session for card." << endl;
+                                                continue;
+                                            default:
+                                                cout << "Invalid operation." << endl;
+                                                continue;
+                                        }
+
+                                        if (!type.empty()) {
+                                            if (selectedCard->transaction(type, amount)) {
+                                                cout << "Transaction successful! New Balance: " << currentUser->getBalance() << endl;
+                                            } else {
+                                                cout << "Transaction failed!" << endl;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    cout << "Incorrect PIN!" << endl;
+                                }
+                            } else {
+                                cout << "Invalid Card Number!" << endl;
+                            }
+                            break;
+                        }
+                        case 3:
+                            // Balance enquiry
+                            cout << "Your current balance for your <<: " << currentUser->getBalance() << endl;
+                            break;
+                        case 4: {
+                            // Deposit money
+                            long long amount;
+                            cout << "Enter amount to deposit: ";
+                            cin >> amount;
+                            // currentUser->deposit(amount);
+                            cout << "Deposit successful! New Balance: " << currentUser->getBalance() << endl;
+                            break;
+                        }
+                        case 5:
+                            // Transfer to another account (implementation needed)
+                            cout << "Enter recipient account number and amount: " << endl;
+                            // Code for transfer
+                            break;
+                        case 6:
+                            // Transfer within own accounts (implementation needed)
+                            cout << "Enter source and destination accounts: " << endl;
+                            // Code for internal transfer
+                            break;
+                        case 7:
+                            userLoggedIn = false;
+                            cout << "Logged out successfully!" << endl;
+                            break;
+                        default:
+                            cout << "Invalid option! Please try again." << endl;
                     }
                 }
+                break;
             }
+            case 3:
+                cout << "Thank you for using PNB Bank System! Goodbye." << endl;
+                return 0;
+            default:
+                cout << "Invalid choice! Please enter a valid option." << endl;
         }
-    } while (stop != 3);
+    }
 
     return 0;
 }
+
