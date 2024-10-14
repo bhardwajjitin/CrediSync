@@ -14,6 +14,6 @@ class Bank{
         static Bank instance;
         return instance;
     }
-    void adduser(string Name,string Acc_No,long long balance,string type,long long initlimit);
+    void adduser(string Name,string Acc_No,long long balance,string type,long long initlimit,int left);
     User* getUser(string Acc_No);
 };

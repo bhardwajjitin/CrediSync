@@ -30,10 +30,10 @@ int main() {
                 cout<<"Enter the Type of Account \n 1.Savings \n 2.Current"<<endl;
                 cin>>type;
                 if(type==1){
-                    PNB.adduser(name, accNo, balance,"Savings",50000);
+                    PNB.adduser(name, accNo, balance,"Savings",50000,5);
                 }
                 else if(type==2){
-                    PNB.adduser(name, accNo, balance,"Current",-1);
+                    PNB.adduser(name, accNo, balance,"Current",-1,-1);
                 }
                 else{
                     cout<<"Please Enter the Valid Choice"<<endl;
@@ -63,7 +63,8 @@ int main() {
                     cout << "4. Deposit Money" << endl;
                     cout << "5. Transfer Funds to Another User" << endl;
                     cout << "6. Transfer Funds Between Own Accounts" << endl;
-                    cout << "7. Logout" << endl;
+                    cout << "7. Check Your limits "<<endl;
+                    cout << "8. Logout" << endl;
                     cout << "Enter your choice: ";
                     int userOption;
                     cin >> userOption;
@@ -130,7 +131,7 @@ int main() {
                                                 continue;
                                             case 4:
                                                 cardSessionActive = false;
-                                                cout << "Ending session for card." << endl;
+                                                cout << "Ending Card Session." << endl;
                                                 continue;
                                             default:
                                                 cout << "Invalid operation." << endl;
@@ -155,28 +156,48 @@ int main() {
                         }
                         case 3:
                             // Balance enquiry
-                            cout << "Your current balance for your <<: " << currentUser->getBalance() << endl;
+                            cout << "Your current balance for your Account is <<: " << currentUser->getBalance() << endl;
                             break;
                         case 4: {
                             // Deposit money
                             long long amount;
                             cout << "Enter amount to deposit: ";
                             cin >> amount;
-                            // currentUser->deposit(amount);
+                            currentUser->deposit(amount);
                             cout << "Deposit successful! New Balance: " << currentUser->getBalance() << endl;
                             break;
                         }
-                        case 5:
-                            // Transfer to another account (implementation needed)
-                            cout << "Enter recipient account number and amount: " << endl;
-                            // Code for transfer
+                        case 5:{
+                            cout << "Enter recipient account number " << endl;
+                            string receive;
+                            long long amount;
+                            cin>>receive;
+                            if(receive!=accNo){
+                            User* receiver=PNB.getUser(receive);
+                            cout<<"Enter the Amount you want to Transfer"<<endl;
+                            cin>>amount;
+                            currentUser->transfer(receiver,amount);
+                            }
+                            else{
+                                continue;
+                            }
                             break;
-                        case 6:
-                            // Transfer within own accounts (implementation needed)
-                            cout << "Enter source and destination accounts: " << endl;
-                            // Code for internal transfer
+                        }
+                        case 6:{
+                            cout << "Enter your destinated account number" << endl;
+                            string dest;
+                            long long myamount;
+                            cin>>dest;
+                            User*destinated=PNB.getUser(dest);
+                            cout<<"Enter the Amount you want to transfer to your own accounts"<<endl;
+                            cin>>myamount;
+                            currentUser->transfer(destinated,myamount);
                             break;
+                        }
                         case 7:
+                            currentUser->checklimits();
+                            break;
+                        case 8:
                             userLoggedIn = false;
                             cout << "Logged out successfully!" << endl;
                             break;

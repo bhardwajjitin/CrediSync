@@ -20,55 +20,70 @@ string Card::getcardno(){
 int Card::getpin(){
     return this->pin;
 }
-bool DebitCard::transaction(string type,long long amount){
-        if (type == "Deposit") {
+bool DebitCard::transaction(string transactiontype, long long amount) {
+    if (*transactionsleft != -1) {
+        if (transactiontype == "Deposit") {
             *user_balance += amount;
-            cout << "Deposit successful! New balance: " << *user_balance <<endl;
+            *transactionsleft -= 1;
+            cout << "Deposit successful! New balance: " << *user_balance << endl;
             return true;
-        } else if (type == "Withdraw") {
-            if(*limitleft!=-1){
-            if (*user_balance >= amount && *limitleft>=amount) {
-                *user_balance -= amount;
-                *limitleft-=amount;
-                cout << "Withdraw successful! New balance: " << *user_balance <<endl;
-                return true;
-            } 
-            else if(*limitleft<amount){
-                cout<<"Your Limit has been reached! Feel free the Contact your branch to increase your Limits"<<endl;
-                return false;
-            }
-            else {
-                cout << "Insufficient funds for withdrawal!" << std::endl;
-                return false;
-            }
-            }
-            else{
-                if (*user_balance >= amount) {
-                *user_balance -= amount;
-                cout << "Withdraw successful! New balance: " << *user_balance <<endl;
-                return true;
+        } 
+        else if (transactiontype == "Withdraw") {
+            if (*limitleft != -1 && *transactionsleft > 0) {
+                if (*user_balance >= amount && *limitleft >= amount) {
+                    *user_balance -= amount;
+                    *limitleft -= amount;  
+                    *transactionsleft -= 1; 
+                    cout << "Withdraw successful! New balance: " << *user_balance << endl;
+                    return true;
+                } 
+                else if (*limitleft < amount) {
+                    cout << "Withdrawal limit exceeded! Contact your branch to increase your limits." << endl;
+                    return false;
+                } 
+                else {
+                    cout << "Insufficient funds for withdrawal!" << endl;
+                    return false;
+                }
             } else {
-                cout << "Insufficient funds for withdrawal!" << std::endl;
+                cout << "Your transaction limit has been reached!" << endl;
                 return false;
-            }
             }
         }
-        return false;
+    } 
+    else {
+        if (transactiontype == "Deposit") {
+            *user_balance += amount;
+            cout << "Deposit successful! New balance: " << *user_balance << endl;
+            return true;
+        } 
+        else if (transactiontype == "Withdraw") {
+            if (*user_balance >= amount) {
+                *user_balance -= amount;
+                cout << "Withdraw successful! New balance: " << *user_balance << endl;
+                return true;
+            } else {
+                cout << "Insufficient funds for withdrawal!" << endl;
+                return false;
+            }
+        }
     }
+    return false; 
+}
 
- bool CreditCard::transaction(string type,long long amount) {
-        if (type == "Deposit") {
+ bool CreditCard::transaction(string transactiontype,long long amount) {
+        if (transactiontype == "Deposit") {
             if (loan >= amount) {
                 loan -= amount;
                 cout << "Deposit successful! Remaining loan: " <<loan <<endl;
             } else {
-                double extra = amount - loan;
+                long long extra = amount - loan;
                 loan = 0;
                 creditlimit += extra;
                 cout << "Loan repaid! New credit limit: " << creditlimit <<endl;
             }
             return true;
-        } else if (type == "Withdraw") {
+        } else if (transactiontype == "Withdraw") {
             if (loan + amount <= creditlimit) {
                 loan += amount;
                 cout << "Withdraw successful! Credit used: " <<creditlimit
