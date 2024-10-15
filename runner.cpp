@@ -64,7 +64,8 @@ int main() {
                     cout << "5. Transfer Funds to Another User" << endl;
                     cout << "6. Transfer Funds Between Own Accounts" << endl;
                     cout << "7. Check Your limits "<<endl;
-                    cout << "8. Logout" << endl;
+                    cout << "8. Delete the User" <<endl;
+                    cout << "9. Logout" << endl;
                     cout << "Enter your choice: ";
                     int userOption;
                     cin >> userOption;
@@ -85,8 +86,13 @@ int main() {
                                 cin >> pin;
 
                                 string cardTypeStr = (cardType == 1) ? "Debit" : "Credit";
-                                currentUser->addCards(cardNo, cardTypeStr, pin);
+                                if(PNB.alreadyexists(cardNo)){
+                                currentUser->addCards(cardNo, cardTypeStr, pin,false);
                                 cout << cardTypeStr<<" Card created successfully!" << endl;
+                                }
+                                else{
+                                    cout<<"Card Number should be unique"<<endl;
+                                }
                             } else {
                                 cout << "Invalid card type!" << endl;
                             }
@@ -99,24 +105,30 @@ int main() {
                             cout << "Enter the Card Number: ";
                             cin >> cardNo;
                             Card* selectedCard = currentUser->getcard(cardNo);
-
+                            if(selectedCard->iscardblock()){
                             if (selectedCard != nullptr) {
                                 int cardPin;
-                                cout << "Enter Card PIN for verification: ";
-                                cin >> cardPin;
+                                int attempts = 0;
+                                int maxAttempts = 3;
 
-                                if (selectedCard->getpin() == cardPin) {
-                                    bool cardSessionActive = true;
-                                    while (cardSessionActive) {
-                                        int cardOption;
-                                        cout << "\n1. Deposit\n2. Withdraw\n3. Check Balance\n4. End Session" << endl;
-                                        cout << "Enter your choice: ";
-                                        cin >> cardOption;
+                                while (attempts < maxAttempts) {
+                                    cout << "Enter Card PIN for verification: ";
+                                    cin >> cardPin;
 
-                                        string type = "";
-                                        long long amount;
-                                        switch (cardOption) {
-                                            case 1:
+                                    if (selectedCard->getpin() == cardPin) {
+                                        bool cardSessionActive = true;
+                                        while (cardSessionActive && selectedCard->iscardblock()) {
+                                            int cardOption;
+                                            cout << "\n1. Deposit\n2. Withdraw\n3. Check Balance\n4. Delete Card \n"
+                                                 << "5. Reset PIN\n6. Show Transaction History\n"
+                                                 << "7. Block Card\n8. End Session" << endl;
+                                            cout << "Enter your choice: ";
+                                            cin >> cardOption;
+
+                                            string type = "";
+                                            long long amount;
+                                            switch (cardOption) {
+                                             case 1:
                                                 type = "Deposit";
                                                 cout << "Enter amount to deposit: ";
                                                 cin >> amount;
@@ -130,29 +142,65 @@ int main() {
                                                 cout << "Your current balance: " << currentUser->getBalance() << endl;
                                                 continue;
                                             case 4:
-                                                cardSessionActive = false;
-                                                cout << "Ending Card Session." << endl;
-                                                continue;
-                                            default:
-                                                cout << "Invalid operation." << endl;
-                                                continue;
-                                        }
+                                                    PNB.deletecard(currentUser,cardNo);
+                                                    cout << "Card deleted successfully." << endl;
+                                                    cardSessionActive = false; // End session after deleting the card
+                                                    continue;
+            
+                                                case 5: // Reset PIN option
+                                                {
+                                                    int oldPin, newPin;
+                                                    cout << "Enter your old PIN: ";
+                                                    cin >> oldPin;
+                                                    cout << "Enter your new PIN: ";
+                                                    cin >> newPin;
+                                                    if (selectedCard->resetPin(oldPin, newPin)) {
+                                                        cout << "PIN reset successful." << endl;
+                                                    } else {
+                                                        cout << "Failed to reset PIN." << endl;
+                                                    }
+                                                    continue;
+                                                }
+                                                case 6: 
+                                                    {
+                                                        // selectedCard->printTransactionHistory();
+                                                        continue;
+                                                    }
+                                                case 7: 
+                                                    {
+                                                        selectedCard->blockcard();
+                                                        continue;
+                                                    }
+                                                case 8:
+                                                    {
+                                                    cardSessionActive = false;
+                                                    cout << "Ending Card Session." << endl;
+                                                    continue;
+                                                    }
+                                                default:
+                                                    cout << "Invalid operation." << endl;
+                                                    continue;
+                                            }
 
-                                        if (!type.empty()) {
-                                            if (selectedCard->transaction(type, amount)) {
-                                                cout << "Transaction successful! New Balance: " << currentUser->getBalance() << endl;
-                                            } else {
-                                                cout << "Transaction failed!" << endl;
+                                            if (!type.empty()) {
+                                                if (selectedCard->transaction(type, amount)) {
+                                                    cout << "Transaction successful! New Balance: " << currentUser->getBalance() << endl;
+                                                } else {
+                                                    cout << "Transaction failed!" << endl;
+                                                }
                                             }
                                         }
+                                    } else {
+                                        attempts++;
+                                        cout << "Incorrect PIN! You have " << (maxAttempts - attempts) << " attempts left." << endl;
                                     }
-                                } else {
-                                    cout << "Incorrect PIN!" << endl;
                                 }
+                                cout << "Too many incorrect attempts. Session terminated." << endl;
                             } else {
                                 cout << "Invalid Card Number!" << endl;
                             }
                             break;
+                        }
                         }
                         case 3:
                             // Balance enquiry
@@ -198,6 +246,10 @@ int main() {
                             currentUser->checklimits();
                             break;
                         case 8:
+                            PNB.deleteuser(accNo);
+                            cout<<"User Successfully Deleted"<<endl;
+                            break;
+                        case 9:
                             userLoggedIn = false;
                             cout << "Logged out successfully!" << endl;
                             break;
@@ -209,12 +261,11 @@ int main() {
             }
             case 3:
                 cout << "Thank you for using PNB Bank System! Goodbye." << endl;
-                return 0;
+                break;
             default:
                 cout << "Invalid choice! Please enter a valid option." << endl;
         }
     }
-
     return 0;
 }
 
