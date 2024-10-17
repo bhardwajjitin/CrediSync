@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+#include "Transaction.hpp"
 using namespace std;
 
 class Card{
@@ -8,6 +9,7 @@ class Card{
     protected:
     string type;
     bool isblock=false;
+    vector<Transaction*>myTransaction;
     public:
     virtual ~Card() {} 
     // constructor for the card class
@@ -22,6 +24,9 @@ class Card{
     string getcardtype();
     bool iscardblock();
     void blockcard();
+    void unblockCard();
+    void addTransaction(string type,long long amount,long long balance,string status,string cardtype);
+    void printTransactionHistory();
 };
 class DebitCard:public Card{
     long long *user_balance;

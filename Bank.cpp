@@ -4,6 +4,7 @@ void Bank::adduser(string Name,string acc_no,long long balance,string acctype,lo
 if(database.find(acc_no)==database.end()){
    User* newuser=new User(Name,acc_no,balance,acctype,limit,left);
    database[acc_no]=newuser;
+   cout<<" Account for " << Name << " created successfully!" << endl;
    }
    else{
     cout<<"User Already exists with this Account number"<<endl;

@@ -18,6 +18,10 @@ void Card::blockcard(){
     isblock=true;
     return;
 }
+void Card::unblockCard(){
+    isblock=false;
+    return;
+}
 void Card::printinfo(){
         cout<<this->card_number<<" "<<this->type<<" "<<this->isblock<<endl;
     }
@@ -29,6 +33,16 @@ int Card::getpin(){
 }
 string Card::getcardtype(){
     return this->type;
+}
+void Card::addTransaction(string type,long long amount,long long balance,string status,string cardtype){
+    Transaction* newtransaction=new Transaction(type,amount,balance,status,cardtype);
+    this->myTransaction.push_back(newtransaction);
+}
+void Card::printTransactionHistory(){
+    cout<<"Type"<<" "<<"Amount"<<" "<<"Remaining Balance"<<" "<<"Status"<<" "<<"Card"<<endl;
+    for(auto it:this->myTransaction){
+        it->printinfo();
+    }
 }
 bool DebitCard::transaction(string transactiontype, long long amount) {
     if (*transactionsleft != -1) {
