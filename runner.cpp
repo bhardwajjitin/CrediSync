@@ -129,18 +129,19 @@ int main()
                     }
                     else if (!selectedCard->iscardblock())
                     {
-                        char unblockOption;
+                        string unblockOption;
                         cout << "This card is blocked. Do you want to unblock it? (y/n): ";
                         cin >> unblockOption;
 
-                        if (unblockOption == 'y' || unblockOption == 'Y')
+                        if (unblockOption == "y" || unblockOption == "Y")
                         {
                             selectedCard->unblockCard();
+                            cout<<"Card is Unblocked"<<endl;
                         }
                         else
                         {
                             cout << "Card remains blocked. Cannot proceed!" << endl;
-                            continue;
+                            break;
                         }
                     }
                     else
@@ -228,7 +229,7 @@ int main()
                                         if (selectedCard->transaction(type, amount))
                                         {
                                             selectedCard->addTransaction(type,amount,currentUser->getBalance(),"Success",selectedCard->getcardtype());
-                                            cout << "Transaction successful! New Balance: " << currentUser->getBalance() << endl;
+                                            // cout << "Transaction successful! New Balance: " << currentUser->getBalance() << endl;
                                         }
                                         else
                                         {
@@ -275,9 +276,14 @@ int main()
                     if (receive != accNo)
                     {
                         User *receiver = PNB.getUser(receive);
+                        if(receiver!=nullptr){
                         cout << "Enter the Amount you want to Transfer" << endl;
                         cin >> amount;
                         currentUser->transfer(receiver, amount);
+                        }
+                        else{
+                            cout<<"User Does Not Exist with this Account Number"<<endl;
+                        }
                     }
                     else
                     {
@@ -292,9 +298,14 @@ int main()
                     long long myamount;
                     cin >> dest;
                     User *destinated = PNB.getUser(dest);
+                    if(destinated!=nullptr){
                     cout << "Enter the Amount you want to transfer to your own accounts" << endl;
                     cin >> myamount;
                     currentUser->transfer(destinated, myamount);
+                    }
+                    else{
+                        cout<<"Please Enter the Valid Account Number"<<endl;
+                    }
                     break;
                 }
                 case 7:
@@ -302,6 +313,7 @@ int main()
                     break;
                 case 8:
                     PNB.deleteuser(accNo);
+                    userLoggedIn = false;
                     cout << "User Successfully Deleted" << endl;
                     break;
                 case 9:

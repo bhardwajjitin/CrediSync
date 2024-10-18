@@ -39,7 +39,7 @@ void Card::addTransaction(string type,long long amount,long long balance,string 
     this->myTransaction.push_back(newtransaction);
 }
 void Card::printTransactionHistory(){
-    cout<<"Type"<<" "<<"Amount"<<" "<<"Remaining Balance"<<" "<<"Status"<<" "<<"Card"<<endl;
+    cout<<"Type"<<" "<<"Amount"<<" "<<"Remaining Balance"<<" "<<"Status"<<" "<<"Card"<<endl;  
     for(auto it:this->myTransaction){
         it->printinfo();
     }
@@ -100,7 +100,7 @@ bool CreditCard::transaction(string transactiontype, long long amount) {
         if (loan >= amount) {
             loan -= amount; 
             cout << "Deposit successful! Remaining loan: " << loan << endl;
-            return false;
+            return true;
         } else {
             long long extra = amount - loan; 
             loan = 0; 
@@ -108,7 +108,6 @@ bool CreditCard::transaction(string transactiontype, long long amount) {
             cout << "Loan repaid! New credit limit: " << creditlimit << endl;
             return true;
         }
-        return false;
     } else if (transactiontype == "Withdraw") {
         if (loan + amount <= creditlimit) {
             loan += amount; 
