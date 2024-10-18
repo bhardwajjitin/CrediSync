@@ -194,15 +194,20 @@ int main()
                                         int oldPin, newPin;
                                         cout << "Enter your old PIN: ";
                                         cin >> oldPin;
+                                        if(oldPin==selectedCard->getpin()){
                                         cout << "Enter your new PIN: ";
                                         cin >> newPin;
                                         if (selectedCard->resetPin(oldPin, newPin))
                                         {
                                             cout << "PIN reset successful." << endl;
                                         }
-                                        else
+                                         else
                                         {
                                             cout << "Failed to reset PIN." << endl;
+                                        }
+                                        }
+                                        else{
+                                            cout<<"Please Enter the Correct Pin"<<endl;
                                         }
                                         continue;
                                     }
