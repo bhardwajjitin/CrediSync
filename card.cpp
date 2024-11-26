@@ -23,7 +23,7 @@ void Card::unblockCard(){
     return;
 }
 void Card::printinfo(){
-        cout<<this->card_number<<" "<<this->type<<" "<<this->isblock<<endl;
+        cout<<this->card_number<<"    "<<this->type<<"     "<<this->isblock<<endl;
     }
 string Card::getcardno(){
     return this->card_number;

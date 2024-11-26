@@ -30,6 +30,7 @@ int main()
             cin >> accNo;
             cout << "Enter the Initial Balance: ";
             cin >> balance;
+            if(balance>0){
             cout << "Enter the Type of Account \n 1.Savings \n 2.Current" << endl;
             cin >> type;
             if (type == 1)
@@ -44,6 +45,10 @@ int main()
             {
                 cout << "Please Enter the Valid Choice" << endl;
                 continue;
+            }
+            }
+            else{
+                cout<<"Please Enter the Valid Balance"<<endl;
             }
             break;
         }
