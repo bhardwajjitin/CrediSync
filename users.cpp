@@ -15,8 +15,12 @@ void User::deposit(long long amount){
     return;
 }
 void User::checklimits(){
+    if(transactionsleft!=-1 && limit!=-1){
 cout << "You have " << transactionsleft << " transactions remaining and your account limit is " << limit << "." << endl;
     return;
+    }
+    cout << "You have unlimited transactions remaining and your account limit is also unlimited" << endl;
+
 }
 void User::transfer(User*reciever,long long amount){
     if(limit!=-1){
